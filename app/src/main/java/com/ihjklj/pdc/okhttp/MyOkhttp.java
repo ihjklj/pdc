@@ -18,7 +18,13 @@ public class MyOkhttp {
     private static OkHttpClient mClient;
 
     public MyOkhttp() {
-        mClient = new OkHttpClient();
+        if (mClient == null) {
+            synchronized (MyOkhttp.class) {
+                if (mClient == null) {
+                    mClient = new OkHttpClient();
+                }
+            }
+        }
     }
 
     public void aget(String url) {

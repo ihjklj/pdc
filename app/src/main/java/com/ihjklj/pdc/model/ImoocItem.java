@@ -6,32 +6,31 @@ package com.ihjklj.pdc.model;
 
 public class ImoocItem {
 
-    private int studentNum;
-    private int date;
+    private int mImageId;
+    private String mStudent;
+    private String mTitle;
+    private int mArrowId;
 
-    public ImoocItem(int num, int date) {
-        studentNum = num;
-        this.date = date;
+    public ImoocItem(int imageid, String title, String student, int arrowid) {
+        mImageId = imageid;
+        mTitle = title;
+        mStudent = student;
+        mArrowId = arrowid;
     }
 
-    public ImoocItem() {
-        studentNum = 0;
-        date = 0;
+    public int getImageId() {
+        return mImageId;
     }
 
-    public void setStudentNum(int num) {
-        this.studentNum = num;
+    public String getTitle() {
+        return mTitle;
     }
 
-    public int getStudentNum() {
-        return studentNum;
+    public String getStudent() {
+        return mStudent;
     }
 
-    public void setDate(int date) {
-        this.date = date;
-    }
-
-    public int getDate() {
-        return date;
+    public int getArrow() {
+        return mArrowId;
     }
 }
