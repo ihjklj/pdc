@@ -1,9 +1,11 @@
 package com.ihjklj.pdc.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
@@ -25,49 +27,42 @@ public class ImoocActivity extends AppCompatActivity {
 
     private ListView mListview;
     private ImoocAdapter mAdapter;
-    private List<ImoocItem> mList;
+    private List<ImoocCourse> mCourseList;
     private boolean mIsInit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.imooc_layout);
 
         initView();
 
+        init();
+
         getData();
     }
-
-    public Handler mHandler = new Handler() {
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 0:
-                    if (!mIsInit) {
-                        List<ImoocItem> list = new ArrayList<ImoocItem>();
-                        //List<ImoocCourse> courelist = msg.obj;
-                        //run();
-                    }
-                    else {
-                        //
-                    }
-                break;
-                default:
-                    break;
-            }
-        }
-    };
 
     private void initView() {
         mListview = (ListView)findViewById(R.id.imooc_layout_listview);
     }
 
-    private void startRun() {
-        //
+    private void init() {
+        mCourseList = new ArrayList<ImoocCourse>();
     }
 
-    private void runListView(List<ImoocItem> list) {
+    private void runListView(List<ImoocCourse> list) {
         mAdapter = new ImoocAdapter(this, R.layout.imooc_item_layout, list);
         mListview.setAdapter(mAdapter);
+        mListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ImoocCourse imooccourse = mCourseList.get(position);
+                Intent intent = new Intent(ImoocActivity.this, ImoocLinechartActivity.class);
+                intent.putExtra("title", imooccourse.getTitle());
+                startActivity(intent);
+            }
+        });
         mIsInit = true;
     }
 
@@ -82,20 +77,15 @@ public class ImoocActivity extends AppCompatActivity {
                 else {
                     Gson jsonParse = new Gson();
                     ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
-                    final List<ImoocCourse> list = new ArrayList<ImoocCourse>();
                     List<String> items = imoocJsonObj.getData();
                     for (String item : items){
                         ImoocCourse course = jsonParse.fromJson(item, ImoocCourse.class);
-                        list.add(course);
+                        mCourseList.add(course);
                     }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            List<ImoocItem> itemlist = new ArrayList<ImoocItem>();
-                            for (ImoocCourse course : list) {
-                                itemlist.add(new ImoocItem(UtilMethod.getDrawableId("test"), course.getTitle(), course.getStudent(), UtilMethod.getDrawableId("test")));
-                            }
-                            runListView(itemlist);
+                            runListView(mCourseList);
                         }
                     });
                 }
