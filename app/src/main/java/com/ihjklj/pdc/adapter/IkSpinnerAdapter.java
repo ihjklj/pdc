@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.ihjklj.pdc.R;
+import com.ihjklj.pdc.model.IkSpinnerItem;
 import java.util.List;
 
 /**
@@ -15,10 +16,10 @@ import java.util.List;
 
 public class IkSpinnerAdapter extends BaseAdapter {
 
-    private List<String> mList;
+    private List<IkSpinnerItem> mList;
     private Context mContext;
 
-    public IkSpinnerAdapter(Context context, List<String> list) {
+    public IkSpinnerAdapter(Context context, List<IkSpinnerItem> list) {
         this.mContext = context;
         this.mList = list;
     }
@@ -53,7 +54,7 @@ public class IkSpinnerAdapter extends BaseAdapter {
             view = convertView;
             viewHolder = (ViewHolder) view.getTag();
         }
-        viewHolder.textview.setText(mList.get(position));
+        viewHolder.textview.setText(mList.get(position).getStr());
         return view;
     }
 

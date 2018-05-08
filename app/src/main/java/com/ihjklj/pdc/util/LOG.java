@@ -12,4 +12,8 @@ public class LOG {
     public static void d(String data) {
         Log.d(MyApplication.TAG, data);
     }
+
+    public static void e(String data) {
+        Log.e(MyApplication.TAG, data);
+    }
 }

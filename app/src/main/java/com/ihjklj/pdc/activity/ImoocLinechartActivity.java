@@ -5,7 +5,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -14,7 +16,10 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.adapter.IkSpinnerAdapter;
+import com.ihjklj.pdc.model.IkSpinnerItem;
 import com.ihjklj.pdc.model.LinechartItem;
+import com.ihjklj.pdc.okhttp.MyOkhttp;
+import com.ihjklj.pdc.util.LOG;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,7 +33,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     private LineChart mLineChart;
     private Spinner mSpinner;
     private IkSpinnerAdapter mSpinnerAdapter;
-    private List<String> mStringList;
+    private List<IkSpinnerItem> mSpinnerItemList;
     private String mTitle;
 
     @Override
@@ -45,7 +50,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
 
         runSpinner();
 
-        runLineChart();
+        runLineChart(getItem());
     }
 
     private void getIntentData() {
@@ -55,27 +60,54 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         }
     }
 
-    private void runSpinner() {
-        mStringList.add("近一个星期");
-        mStringList.add("近一个月");
-        mStringList.add("近一个季度");
-        mStringList.add("近半年");
-        mStringList.add("近一年");
-        mSpinnerAdapter = new IkSpinnerAdapter(this, mStringList);
-        mSpinner.setAdapter(mSpinnerAdapter);
-    }
-
     private void initView() {
         mLineChart = (LineChart)findViewById(R.id.linechart_layout_linechart);
         mSpinner = (Spinner)findViewById(R.id.linechart_layout_spinner);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                IkSpinnerItem spinnerItem = (IkSpinnerItem)mSpinner.getSelectedItem();
+                LOG.e("spinner selected " + spinnerItem.getStr());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //如果适配器中的list被清空且调用了notifyDataSetChanged时会调用本方法
+                LOG.e("nothing selected.");
+            }
+        });
     }
 
     private void init() {
-        mStringList = new ArrayList<String>();
+        mSpinnerItemList = new ArrayList<IkSpinnerItem>();
     }
 
-    private void runLineChart() {
-        LinechartItem[] items = getItem();
+    private void runSpinner() {
+        mSpinnerItemList.add(new IkSpinnerItem(1, "近一个星期"));
+        mSpinnerItemList.add(new IkSpinnerItem(2, "近一个月"));
+        mSpinnerItemList.add(new IkSpinnerItem(3, "近一个季度"));
+        mSpinnerItemList.add(new IkSpinnerItem(4, "近半年"));
+        mSpinnerItemList.add(new IkSpinnerItem(5, "近一年"));
+        mSpinnerAdapter = new IkSpinnerAdapter(this, mSpinnerItemList);
+        mSpinner.setAdapter(mSpinnerAdapter);
+    }
+
+    private void getLineChartData() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String data = new MyOkhttp().sget("http://47.98.153.250/imooc/");
+                if (data == null) {
+                    LOG.d("data is empty!");
+                }
+                else {
+                    //
+                }
+            }
+        }).start();
+    }
+
+    private void runLineChart(LinechartItem[] items) {
         List<Entry> entries = new ArrayList<Entry>();
         for (LinechartItem item : items) {
             entries.add(new Entry(item.getTime(), item.getNum()));
