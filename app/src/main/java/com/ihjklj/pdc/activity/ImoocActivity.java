@@ -11,11 +11,9 @@ import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.adapter.ImoocAdapter;
 import com.ihjklj.pdc.model.ImoocCourse;
-import com.ihjklj.pdc.model.ImoocItem;
 import com.ihjklj.pdc.model.ImoocJson;
 import com.ihjklj.pdc.okhttp.MyOkhttp;
 import com.ihjklj.pdc.util.LOG;
-import com.ihjklj.pdc.util.UtilMethod;
 import java.util.ArrayList;
 import java.util.List;
 

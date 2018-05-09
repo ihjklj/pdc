@@ -1,5 +1,6 @@
 package com.ihjklj.pdc.okhttp;
 
+import com.ihjklj.pdc.ikInterface.ImoocInterface;
 import com.ihjklj.pdc.util.FileMethod;
 import com.ihjklj.pdc.util.LOG;
 import java.io.IOException;
@@ -63,5 +64,30 @@ public class MyOkhttp {
             e.printStackTrace();
         }
         return responseData;
+    }
+
+    public void httpGet(String url, final ImoocInterface minterface) {
+        Request request = new Request.Builder()
+                .get()
+                .url(url)
+                .build();
+
+        mClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                LOG.d("get failed!");
+                if (minterface != null) {
+                    minterface.getFailed();
+                }
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                LOG.d("get success.");
+                if (minterface != null) {
+                    minterface.getCourse(response.body().string());
+                }
+            }
+        });
     }
 }

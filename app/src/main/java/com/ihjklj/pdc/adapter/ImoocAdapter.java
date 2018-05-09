@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.model.ImoocCourse;
-import com.ihjklj.pdc.model.ImoocItem;
 import java.util.List;
 
 /**

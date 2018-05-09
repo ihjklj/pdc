@@ -14,9 +14,12 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.adapter.IkSpinnerAdapter;
 import com.ihjklj.pdc.model.IkSpinnerItem;
+import com.ihjklj.pdc.model.ImoocCourse;
+import com.ihjklj.pdc.model.ImoocJson;
 import com.ihjklj.pdc.model.LinechartItem;
 import com.ihjklj.pdc.okhttp.MyOkhttp;
 import com.ihjklj.pdc.util.LOG;
@@ -67,13 +70,13 @@ public class ImoocLinechartActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 IkSpinnerItem spinnerItem = (IkSpinnerItem)mSpinner.getSelectedItem();
-                LOG.e("spinner selected " + spinnerItem.getStr());
+                LOG.d("spinner selected " + spinnerItem.getStr());
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 //如果适配器中的list被清空且调用了notifyDataSetChanged时会调用本方法
-                LOG.e("nothing selected.");
+                LOG.d("nothing selected.");
             }
         });
     }
@@ -83,11 +86,11 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     }
 
     private void runSpinner() {
-        mSpinnerItemList.add(new IkSpinnerItem(1, "近一个星期"));
-        mSpinnerItemList.add(new IkSpinnerItem(2, "近一个月"));
-        mSpinnerItemList.add(new IkSpinnerItem(3, "近一个季度"));
-        mSpinnerItemList.add(new IkSpinnerItem(4, "近半年"));
-        mSpinnerItemList.add(new IkSpinnerItem(5, "近一年"));
+        mSpinnerItemList.add(new IkSpinnerItem(7, "近一个星期"));
+        mSpinnerItemList.add(new IkSpinnerItem(30, "近一个月"));
+        mSpinnerItemList.add(new IkSpinnerItem(90, "近一个季度"));
+        mSpinnerItemList.add(new IkSpinnerItem(180, "近半年"));
+        mSpinnerItemList.add(new IkSpinnerItem(360, "近一年"));
         mSpinnerAdapter = new IkSpinnerAdapter(this, mSpinnerItemList);
         mSpinner.setAdapter(mSpinnerAdapter);
     }
@@ -96,12 +99,26 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String data = new MyOkhttp().sget("http://47.98.153.250/imooc/");
+                String data = new MyOkhttp().sget("http://47.98.153.250:30001/imooc/keyflag/");
                 if (data == null) {
                     LOG.d("data is empty!");
                 }
                 else {
-                    //
+                    Gson jsonParse = new Gson();
+                    ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
+                    List<String> items = imoocJsonObj.getData();
+                    final LinechartItem[] linchartitems = new LinechartItem[10];
+                    for (int i=0; i<items.size(); i++){
+                        ImoocCourse course = jsonParse.fromJson(items.get(i), ImoocCourse.class);
+                        int linechartDate = Integer.parseInt(course.getAtime().replace("-", ""));
+                        linchartitems[i] = new LinechartItem(Integer.parseInt(course.getStudent()), linechartDate);
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runLineChart(linchartitems);
+                        }
+                    });
                 }
             }
         }).start();
