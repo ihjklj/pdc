@@ -7,26 +7,27 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.ihjklj.pdc.R;
-import com.ihjklj.pdc.model.ImoocCourse;
+import com.ihjklj.pdc.model.ImoocJson;
+
 import java.util.List;
 
 /**
  * Created by ihjklj on 2018/5/8.
  */
 
-public class ImoocAdapter extends ArrayAdapter<ImoocCourse> {
+public class ImoocAdapter extends ArrayAdapter<ImoocJson.ImoocCourse> {
 
     private Context mContext;
     private int mResourceid;
 
-    public ImoocAdapter(Context context, int resourceid, List<ImoocCourse> data) {
+    public ImoocAdapter(Context context, int resourceid, List<ImoocJson.ImoocCourse> data) {
         super(context, resourceid, data);
         mContext = context;
         mResourceid = resourceid;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImoocCourse course = getItem(position);
+        ImoocJson.ImoocCourse course = getItem(position);
         View view = null;
         ViewHolder viewHolder = null;
         if (convertView == null) {
@@ -42,7 +43,7 @@ public class ImoocAdapter extends ArrayAdapter<ImoocCourse> {
             viewHolder = (ViewHolder) view.getTag();
         }
         viewHolder.title.setText(course.getTitle());
-        viewHolder.student.setText(course.getStudent());
+        viewHolder.student.setText(String.valueOf(course.getStudent()));
         return view;
     }
 

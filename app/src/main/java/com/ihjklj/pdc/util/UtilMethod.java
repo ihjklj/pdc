@@ -1,8 +1,10 @@
 package com.ihjklj.pdc.util;
 
+import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
-
+import com.ihjklj.pdc.model.ImoocJson;
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/5/8.
@@ -26,5 +28,11 @@ public class UtilMethod {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public static List<ImoocJson.ImoocCourse> parseCourse(String data) {
+        Gson jsonParse = new Gson();
+        ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
+        return imoocJsonObj.getData();
     }
 }

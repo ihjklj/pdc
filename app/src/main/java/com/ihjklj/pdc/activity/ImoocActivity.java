@@ -10,9 +10,9 @@ import android.widget.ListView;
 import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.adapter.ImoocAdapter;
-import com.ihjklj.pdc.model.ImoocCourse;
+import com.ihjklj.pdc.ikInterface.ImoocInterface;
 import com.ihjklj.pdc.model.ImoocJson;
-import com.ihjklj.pdc.okhttp.MyOkhttp;
+import com.ihjklj.pdc.okhttp.IkOkhttp;
 import com.ihjklj.pdc.util.LOG;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class ImoocActivity extends AppCompatActivity {
 
     private ListView mListview;
     private ImoocAdapter mAdapter;
-    private List<ImoocCourse> mCourseList;
+    private List<ImoocJson.ImoocCourse> mCourseList;
     private boolean mIsInit = false;
 
     @Override
@@ -46,18 +46,18 @@ public class ImoocActivity extends AppCompatActivity {
     }
 
     private void init() {
-        mCourseList = new ArrayList<ImoocCourse>();
+        mCourseList = new ArrayList<ImoocJson.ImoocCourse>();
     }
 
-    private void runListView(List<ImoocCourse> list) {
+    private void runListView(List<ImoocJson.ImoocCourse> list) {
         mAdapter = new ImoocAdapter(this, R.layout.imooc_item_layout, list);
         mListview.setAdapter(mAdapter);
         mListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ImoocCourse imooccourse = mCourseList.get(position);
+                ImoocJson.ImoocCourse imooccourse = mCourseList.get(position);
                 Intent intent = new Intent(ImoocActivity.this, ImoocLinechartActivity.class);
-                intent.putExtra("title", imooccourse.getTitle());
+                intent.putExtra("imoocCourse", imooccourse);
                 startActivity(intent);
             }
         });
@@ -68,25 +68,40 @@ public class ImoocActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String data = new MyOkhttp().sget("http://47.98.153.250:30001/imooc/");
-                if (data == null) {
-                    LOG.d("requet imooc data failed!");
-                }
-                else {
-                    Gson jsonParse = new Gson();
-                    ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
-                    List<String> items = imoocJsonObj.getData();
-                    for (String item : items){
-                        ImoocCourse course = jsonParse.fromJson(item, ImoocCourse.class);
-                        mCourseList.add(course);
-                    }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            runListView(mCourseList);
+                new IkOkhttp().httpGet("http://47.98.153.250:30001/imooc/", new ImoocInterface() {
+                    @Override
+                    public void getCourse(String data) {
+                        if (data != null) {
+                            try {
+                                Gson jsonParse = new Gson();
+                                ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
+                                List<ImoocJson.ImoocCourse> courses = imoocJsonObj.getData();
+                                if (!courses.isEmpty()) {
+                                    //mCourseList.clear();
+                                    for (ImoocJson.ImoocCourse course :courses ) {
+                                        mCourseList.add(course);
+                                    }
+                                }
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                                return ;
+                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    runListView(mCourseList);
+                                }
+                            });
                         }
-                    });
-                }
+                    }
+
+                    @Override
+                    public int getFailed() {
+                        LOG.d("request url failed!");
+                        return 0;
+                    }
+                });
             }
         }).start();
     }

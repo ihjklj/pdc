@@ -1,6 +1,5 @@
 package com.ihjklj.pdc.ikInterface;
 
-import com.ihjklj.pdc.model.ImoocCourse;
 import java.util.List;
 
 /**
@@ -9,6 +8,6 @@ import java.util.List;
 
 public interface ImoocInterface {
 
-    public List<ImoocCourse> getCourse(String data);
+    public void getCourse(String data);
     public int getFailed();
 }

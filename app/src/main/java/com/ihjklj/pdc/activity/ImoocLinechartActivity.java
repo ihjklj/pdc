@@ -1,6 +1,5 @@
 package com.ihjklj.pdc.activity;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,13 +15,14 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
-import com.ihjklj.pdc.adapter.IkSpinnerAdapter;
-import com.ihjklj.pdc.model.IkSpinnerItem;
-import com.ihjklj.pdc.model.ImoocCourse;
+import com.ihjklj.pdc.adapter.ImoocSpinnerAdapter;
+import com.ihjklj.pdc.ikInterface.ImoocInterface;
 import com.ihjklj.pdc.model.ImoocJson;
+import com.ihjklj.pdc.model.ImoocSpinnerItem;
 import com.ihjklj.pdc.model.LinechartItem;
-import com.ihjklj.pdc.okhttp.MyOkhttp;
+import com.ihjklj.pdc.okhttp.IkOkhttp;
 import com.ihjklj.pdc.util.LOG;
+import com.ihjklj.pdc.util.UtilMethod;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -35,9 +35,9 @@ public class ImoocLinechartActivity extends AppCompatActivity {
 
     private LineChart mLineChart;
     private Spinner mSpinner;
-    private IkSpinnerAdapter mSpinnerAdapter;
-    private List<IkSpinnerItem> mSpinnerItemList;
-    private String mTitle;
+    private ImoocSpinnerAdapter mSpinnerAdapter;
+    private List<ImoocSpinnerItem> mSpinnerItemList;
+    private ImoocJson.ImoocCourse mImoocCourse;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,9 +57,8 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     }
 
     private void getIntentData() {
-        if (mTitle == null) {
-            Intent intent = getIntent();
-            mTitle = intent.getStringExtra("title");
+        if (mImoocCourse == null) {
+            mImoocCourse = getIntent().getParcelableExtra("imoocCourse");
         }
     }
 
@@ -69,8 +68,10 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                IkSpinnerItem spinnerItem = (IkSpinnerItem)mSpinner.getSelectedItem();
+                ImoocSpinnerItem spinnerItem = (ImoocSpinnerItem)mSpinner.getSelectedItem();
                 LOG.d("spinner selected " + spinnerItem.getStr());
+                //mSpinner.setEnabled(false);
+                getLineChartData("title_" + mImoocCourse.getTitle() + "_" + spinnerItem.getId());
             }
 
             @Override
@@ -82,49 +83,60 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     }
 
     private void init() {
-        mSpinnerItemList = new ArrayList<IkSpinnerItem>();
+        mSpinnerItemList = new ArrayList<ImoocSpinnerItem>();
     }
 
     private void runSpinner() {
-        mSpinnerItemList.add(new IkSpinnerItem(7, "近一个星期"));
-        mSpinnerItemList.add(new IkSpinnerItem(30, "近一个月"));
-        mSpinnerItemList.add(new IkSpinnerItem(90, "近一个季度"));
-        mSpinnerItemList.add(new IkSpinnerItem(180, "近半年"));
-        mSpinnerItemList.add(new IkSpinnerItem(360, "近一年"));
-        mSpinnerAdapter = new IkSpinnerAdapter(this, mSpinnerItemList);
+        mSpinnerItemList.add(new ImoocSpinnerItem(7, "近一个星期"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(30, "近一个月"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(90, "近一个季度"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(180, "近半年"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(360, "近一年"));
+        mSpinnerAdapter = new ImoocSpinnerAdapter(this, mSpinnerItemList);
         mSpinner.setAdapter(mSpinnerAdapter);
     }
 
-    private void getLineChartData() {
+    private void getLineChartData(final String keyname) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String data = new MyOkhttp().sget("http://47.98.153.250:30001/imooc/keyflag/");
-                if (data == null) {
-                    LOG.d("data is empty!");
-                }
-                else {
-                    Gson jsonParse = new Gson();
-                    ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
-                    List<String> items = imoocJsonObj.getData();
-                    final LinechartItem[] linchartitems = new LinechartItem[10];
-                    for (int i=0; i<items.size(); i++){
-                        ImoocCourse course = jsonParse.fromJson(items.get(i), ImoocCourse.class);
-                        int linechartDate = Integer.parseInt(course.getAtime().replace("-", ""));
-                        linchartitems[i] = new LinechartItem(Integer.parseInt(course.getStudent()), linechartDate);
-                    }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            runLineChart(linchartitems);
+                new IkOkhttp().httpGet("http://47.98.153.250:30001/imooc/keyflag/" + keyname, new ImoocInterface() {
+                    @Override
+                    public void getCourse(String data) {
+                        if (data != null) {
+                            LOG.d("res : " + data);
+                            try {
+                                List<ImoocJson.ImoocCourse> courseList = new Gson().fromJson(data, ImoocJson.class).getData();
+                                final List<LinechartItem> linchartitemList = new ArrayList<LinechartItem>();
+                                for (ImoocJson.ImoocCourse course : courseList) {
+                                    int datatime = Integer.parseInt(course.getAtime().replace("-", ""));
+                                    linchartitemList.add(new LinechartItem(course.getStudent(), datatime));
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        runLineChart(linchartitemList);
+                                        //mSpinner.setEnabled(true);
+                                    }
+                                });
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                    });
-                }
+                    }
+
+                    @Override
+                    public int getFailed() {
+                        LOG.e("request failed!");
+                        return 0;
+                    }
+                });
             }
         }).start();
     }
 
-    private void runLineChart(LinechartItem[] items) {
+    private void runLineChart(List<LinechartItem> items) {
         List<Entry> entries = new ArrayList<Entry>();
         for (LinechartItem item : items) {
             entries.add(new Entry(item.getTime(), item.getNum()));
@@ -136,14 +148,15 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         mLineChart.setData(linedata);
         XAxis xAxis = mLineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        //mLineChart.setDescription("test");
         mLineChart.invalidate();
     }
 
-    private LinechartItem[] getItem() {
-        LinechartItem[] items = new LinechartItem[10];
+    private List<LinechartItem> getItem() {
+        List<LinechartItem> linechartItemList = new ArrayList<LinechartItem>();
         for (int i=0; i<10; i++) {
-            items[i] = new LinechartItem(new Random().nextInt(1000), i);
+            linechartItemList.add(new LinechartItem(new Random().nextInt(1000), i));
         }
-        return items;
+        return linechartItemList;
     }
 }

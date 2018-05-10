@@ -14,13 +14,13 @@ import okhttp3.Response;
  * Created by ihjklj on 2018/5/6.
  */
 
-public class MyOkhttp {
+public class IkOkhttp {
 
     private static OkHttpClient mClient;
 
-    public MyOkhttp() {
+    public IkOkhttp() {
         if (mClient == null) {
-            synchronized (MyOkhttp.class) {
+            synchronized (IkOkhttp.class) {
                 if (mClient == null) {
                     mClient = new OkHttpClient();
                 }

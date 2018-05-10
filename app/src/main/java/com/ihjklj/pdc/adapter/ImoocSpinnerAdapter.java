@@ -7,19 +7,19 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.ihjklj.pdc.R;
-import com.ihjklj.pdc.model.IkSpinnerItem;
+import com.ihjklj.pdc.model.ImoocSpinnerItem;
 import java.util.List;
 
 /**
  * Created by ihjklj on 2018/5/8.
  */
 
-public class IkSpinnerAdapter extends BaseAdapter {
+public class ImoocSpinnerAdapter extends BaseAdapter {
 
-    private List<IkSpinnerItem> mList;
+    private List<ImoocSpinnerItem> mList;
     private Context mContext;
 
-    public IkSpinnerAdapter(Context context, List<IkSpinnerItem> list) {
+    public ImoocSpinnerAdapter(Context context, List<ImoocSpinnerItem> list) {
         this.mContext = context;
         this.mList = list;
     }
