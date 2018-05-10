@@ -36,7 +36,7 @@ public class ImoocJson {
          */
 
         private String category;
-        private double index_sign;
+        private int index_sign;
         private String level;
         private String url;
         private String title;
@@ -54,11 +54,11 @@ public class ImoocJson {
             this.category = category;
         }
 
-        public double getIndex_sign() {
+        public int getIndex_sign() {
             return index_sign;
         }
 
-        public void setIndex_sign(double index_sign) {
+        public void setIndex_sign(int index_sign) {
             this.index_sign = index_sign;
         }
 
@@ -134,7 +134,7 @@ public class ImoocJson {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(this.category);
-            dest.writeDouble(this.index_sign);
+            dest.writeInt(this.index_sign);
             dest.writeString(this.level);
             dest.writeString(this.url);
             dest.writeString(this.title);
@@ -150,7 +150,7 @@ public class ImoocJson {
 
         protected ImoocCourse(Parcel in) {
             this.category = in.readString();
-            this.index_sign = in.readDouble();
+            this.index_sign = in.readInt();
             this.level = in.readString();
             this.url = in.readString();
             this.title = in.readString();

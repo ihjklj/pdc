@@ -2,4 +2,5 @@
     <string name="app_name">pdc</string>
     <string name="up_arrow">\u2191</string>
     <string name="down_arrow">\u2193</string>
+    <string name="horizontal_line">\u2013</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.ihjklj.pdc.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,15 @@ public class ImoocAdapter extends ArrayAdapter<ImoocJson.ImoocCourse> {
         }
         viewHolder.title.setText(course.getTitle());
         viewHolder.student.setText(String.valueOf(course.getStudent()));
+        double indexSign = course.getIndex_sign();
+        if (indexSign > 0) {
+            viewHolder.arrow.setText(R.string.up_arrow);
+            viewHolder.arrow.setTextColor(Color.RED);
+        }
+        else if (indexSign < 0) {
+            viewHolder.arrow.setText(R.string.down_arrow);
+            viewHolder.arrow.setTextColor(Color.BLACK);
+        }
         return view;
     }
 

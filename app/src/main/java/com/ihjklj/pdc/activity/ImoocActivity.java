@@ -137,10 +137,10 @@ public class ImoocActivity extends AppCompatActivity {
                         ret = objt.getStudent() - objs.getStudent();
                         break;
                     case DefineSet.IMOOC_COURSE_TYPE_UP:
-                        ret = (int)(objt.getIndex_sign() - objs.getIndex_sign());
+                        ret = objt.getIndex_sign() - objs.getIndex_sign();
                         break;
                     case DefineSet.IMOOC_COURSE_TYPE_DOWN:
-                        ret = (int)(objs.getIndex_sign() - objt.getIndex_sign());
+                        ret = objs.getIndex_sign() - objt.getIndex_sign();
                         break;
                     default:
                         ret = objs.getId() - objt.getId();

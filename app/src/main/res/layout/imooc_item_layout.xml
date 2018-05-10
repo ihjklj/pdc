@@ -18,10 +18,9 @@
 
     <TextView
         android:id="@+id/imooc_item_layout_arrow"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="20dp"
         android:layout_height="match_parent"
-        android:text="@string/up_arrow"
-        android:textColor="@color/colorred"/>
+        android:text="@string/horizontal_line"
+        android:textColor="@color/colorblack"/>
 
 </LinearLayout>

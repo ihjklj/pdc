@@ -38,6 +38,7 @@ public class UtilMethod {
     }
 
     public static List<ImoocJson.ImoocCourse> imoocGet(String url) {
+        LOG.d("rquest url : " + url);
         String data = new IkOkhttp().sget(url);
         if (data != null) {
             try {
