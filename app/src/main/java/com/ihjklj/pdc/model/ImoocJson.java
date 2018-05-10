@@ -2,6 +2,7 @@ package com.ihjklj.pdc.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import java.util.List;
 
 /**
@@ -22,17 +23,20 @@ public class ImoocJson {
 
     public static class ImoocCourse implements Parcelable {
         /**
-         * category : 动效动画
+         * category : Python
+         * index_sign : 0.0
          * level : 入门
-         * url : http://imooc.com/learn/985
-         * title : MAYA-材质基础入门
-         * introduction : Maya材质制作基础命令详解，并快速入门Maya材质制作
-         * image_url : http://img2.mukewang.com/5ae4458000016dfe05400300-240-135.jpg
-         * student : 5
-         * atime : 2018-05-09
+         * url : http://imooc.com/learn/988
+         * title : 区块链技术核心概念与原理讲解
+         * introduction : 登链科技首席技术官(Tiny熊），为你讲解区块链技术核心概念与原理
+         * image_url : http://img3.mukewang.com/5ae3e5b80001818c06000338-240-135.jpg
+         * student : 123
+         * atime : 2018-05-10
+         * id : 1
          */
 
         private String category;
+        private double index_sign;
         private String level;
         private String url;
         private String title;
@@ -40,6 +44,7 @@ public class ImoocJson {
         private String image_url;
         private int student;
         private String atime;
+        private int id;
 
         public String getCategory() {
             return category;
@@ -47,6 +52,14 @@ public class ImoocJson {
 
         public void setCategory(String category) {
             this.category = category;
+        }
+
+        public double getIndex_sign() {
+            return index_sign;
+        }
+
+        public void setIndex_sign(double index_sign) {
+            this.index_sign = index_sign;
         }
 
         public String getLevel() {
@@ -105,6 +118,14 @@ public class ImoocJson {
             this.atime = atime;
         }
 
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
         @Override
         public int describeContents() {
             return 0;
@@ -113,6 +134,7 @@ public class ImoocJson {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(this.category);
+            dest.writeDouble(this.index_sign);
             dest.writeString(this.level);
             dest.writeString(this.url);
             dest.writeString(this.title);
@@ -120,6 +142,7 @@ public class ImoocJson {
             dest.writeString(this.image_url);
             dest.writeInt(this.student);
             dest.writeString(this.atime);
+            dest.writeInt(this.id);
         }
 
         public ImoocCourse() {
@@ -127,6 +150,7 @@ public class ImoocJson {
 
         protected ImoocCourse(Parcel in) {
             this.category = in.readString();
+            this.index_sign = in.readDouble();
             this.level = in.readString();
             this.url = in.readString();
             this.title = in.readString();
@@ -134,6 +158,7 @@ public class ImoocJson {
             this.image_url = in.readString();
             this.student = in.readInt();
             this.atime = in.readString();
+            this.id = in.readInt();
         }
 
         public static final Parcelable.Creator<ImoocCourse> CREATOR = new Parcelable.Creator<ImoocCourse>() {

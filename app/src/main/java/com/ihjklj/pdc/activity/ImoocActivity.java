@@ -34,6 +34,7 @@ public class ImoocActivity extends AppCompatActivity {
     private List<ImoocSpinnerItem> mSpinnerItemList;
     private ImoocSpinnerAdapter mSpinnerAdapter;
     private boolean mIsInit;
+    private int mCurrTypeFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,13 +77,14 @@ public class ImoocActivity extends AppCompatActivity {
         mCourseList = new ArrayList<ImoocJson.ImoocCourse>();
         mIsInit = false;
         mSpinnerItemList = new ArrayList<ImoocSpinnerItem>();
+        mCurrTypeFlag = 0;
     }
 
     private void runSpinner() {
-        mSpinnerItemList.add(new ImoocSpinnerItem(1, "网站顺序"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(2, "学习人数"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(3, "上升最快"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(4, "下降最快"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NET, "网站顺序"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NUM, "学习人数"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_UP, "上升最快"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_DOWN, "下降最快"));
         mSpinnerAdapter = new ImoocSpinnerAdapter(this, mSpinnerItemList);
         mSpinner.setAdapter(mSpinnerAdapter);
     }
@@ -122,11 +124,28 @@ public class ImoocActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void notifyList(int flag) {
+    private void notifyList(final int flag) {
         Collections.sort(mCourseList, new Comparator<ImoocJson.ImoocCourse>() {
             @Override
             public int compare(ImoocJson.ImoocCourse objs, ImoocJson.ImoocCourse objt) {
-                return objt.getStudent() - objs.getStudent();
+                int ret = 0;
+                switch (flag) {
+                    case DefineSet.IMOOC_COURSE_TYPE_NET:
+                        ret = objs.getId() - objt.getId();
+                        break;
+                    case DefineSet.IMOOC_COURSE_TYPE_NUM:
+                        ret = objt.getStudent() - objs.getStudent();
+                        break;
+                    case DefineSet.IMOOC_COURSE_TYPE_UP:
+                        ret = (int)(objt.getIndex_sign() - objs.getIndex_sign());
+                        break;
+                    case DefineSet.IMOOC_COURSE_TYPE_DOWN:
+                        ret = (int)(objs.getIndex_sign() - objt.getIndex_sign());
+                        break;
+                    default:
+                        ret = objs.getId() - objt.getId();
+                }
+                return ret;
             }
         });
         mAdapter.notifyDataSetChanged();
