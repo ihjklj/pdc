@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="languages">
+        <item>学习人数</item>
+        <item>上升最快</item>
+        <item>下降最快</item>
+    </string-array>
+</resources>

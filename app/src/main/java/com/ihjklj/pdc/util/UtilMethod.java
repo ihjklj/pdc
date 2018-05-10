@@ -3,6 +3,7 @@ package com.ihjklj.pdc.util;
 import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.model.ImoocJson;
+import com.ihjklj.pdc.okhttp.IkOkhttp;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -34,5 +35,22 @@ public class UtilMethod {
         Gson jsonParse = new Gson();
         ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
         return imoocJsonObj.getData();
+    }
+
+    public static List<ImoocJson.ImoocCourse> imoocGet(String url) {
+        String data = new IkOkhttp().sget(url);
+        if (data != null) {
+            try {
+                LOG.d("data : " + data);
+                Gson jsonParse = new Gson();
+                ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
+                List<ImoocJson.ImoocCourse> coursesList = imoocJsonObj.getData();
+                return coursesList;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

@@ -90,4 +90,23 @@ public class IkOkhttp {
             }
         });
     }
+
+    public void synHttpGet(String url, final ImoocInterface minterface) {
+        String responseData = null;
+        Request request = new Request.Builder()
+                .get()
+                .url(url)
+                .build();
+        try {
+            Response res = mClient.newCall(request).execute();
+            responseData = res.body().string();
+            LOG.d("get success.");
+            if (minterface != null) {
+                minterface.getCourse(res.body().string());
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

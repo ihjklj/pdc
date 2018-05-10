@@ -7,14 +7,18 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import com.google.gson.Gson;
+import android.widget.Spinner;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.adapter.ImoocAdapter;
-import com.ihjklj.pdc.ikInterface.ImoocInterface;
+import com.ihjklj.pdc.adapter.ImoocSpinnerAdapter;
 import com.ihjklj.pdc.model.ImoocJson;
-import com.ihjklj.pdc.okhttp.IkOkhttp;
+import com.ihjklj.pdc.model.ImoocSpinnerItem;
+import com.ihjklj.pdc.set.DefineSet;
 import com.ihjklj.pdc.util.LOG;
+import com.ihjklj.pdc.util.UtilMethod;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -23,10 +27,13 @@ import java.util.List;
 
 public class ImoocActivity extends AppCompatActivity {
 
+    private Spinner mSpinner;
     private ListView mListview;
     private ImoocAdapter mAdapter;
     private List<ImoocJson.ImoocCourse> mCourseList;
-    private boolean mIsInit = false;
+    private List<ImoocSpinnerItem> mSpinnerItemList;
+    private ImoocSpinnerAdapter mSpinnerAdapter;
+    private boolean mIsInit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,19 +41,50 @@ public class ImoocActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.imooc_layout);
 
-        initView();
-
         init();
 
-        getData();
+        initView();
+
+        runSpinner();
     }
 
     private void initView() {
+        mSpinner = (Spinner)findViewById(R.id.imooc_layout_spinner);
         mListview = (ListView)findViewById(R.id.imooc_layout_listview);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ImoocSpinnerItem item = (ImoocSpinnerItem)mSpinner.getSelectedItem();
+                LOG.d("selected item " + item);
+                if (!mIsInit) {
+                    getCourses();
+                    mIsInit = true;
+                }
+                else {
+                    notifyList(item.getId());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                LOG.d("nothing selected.");
+            }
+        });
     }
 
     private void init() {
         mCourseList = new ArrayList<ImoocJson.ImoocCourse>();
+        mIsInit = false;
+        mSpinnerItemList = new ArrayList<ImoocSpinnerItem>();
+    }
+
+    private void runSpinner() {
+        mSpinnerItemList.add(new ImoocSpinnerItem(1, "网站顺序"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(2, "学习人数"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(3, "上升最快"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(4, "下降最快"));
+        mSpinnerAdapter = new ImoocSpinnerAdapter(this, mSpinnerItemList);
+        mSpinner.setAdapter(mSpinnerAdapter);
     }
 
     private void runListView(List<ImoocJson.ImoocCourse> list) {
@@ -64,45 +102,33 @@ public class ImoocActivity extends AppCompatActivity {
         mIsInit = true;
     }
 
-    private void getData() {
+    private void getCourses() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                new IkOkhttp().httpGet("http://47.98.153.250:30001/imooc/", new ImoocInterface() {
-                    @Override
-                    public void getCourse(String data) {
-                        if (data != null) {
-                            try {
-                                Gson jsonParse = new Gson();
-                                ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
-                                List<ImoocJson.ImoocCourse> courses = imoocJsonObj.getData();
-                                if (!courses.isEmpty()) {
-                                    //mCourseList.clear();
-                                    for (ImoocJson.ImoocCourse course :courses ) {
-                                        mCourseList.add(course);
-                                    }
-                                }
-                            }
-                            catch (Exception e) {
-                                e.printStackTrace();
-                                return ;
-                            }
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    runListView(mCourseList);
-                                }
-                            });
-                        }
+                List<ImoocJson.ImoocCourse> coursesList = UtilMethod.imoocGet(DefineSet.IMOOC_URL);
+                if (coursesList != null) {
+                    for (ImoocJson.ImoocCourse course : coursesList) {
+                        mCourseList.add(course);
                     }
-
+                }
+                runOnUiThread(new Runnable() {
                     @Override
-                    public int getFailed() {
-                        LOG.d("request url failed!");
-                        return 0;
+                    public void run() {
+                        runListView(mCourseList);
                     }
                 });
             }
         }).start();
+    }
+
+    private void notifyList(int flag) {
+        Collections.sort(mCourseList, new Comparator<ImoocJson.ImoocCourse>() {
+            @Override
+            public int compare(ImoocJson.ImoocCourse objs, ImoocJson.ImoocCourse objt) {
+                return objt.getStudent() - objs.getStudent();
+            }
+        });
+        mAdapter.notifyDataSetChanged();
     }
 }
