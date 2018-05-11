@@ -1,5 +1,9 @@
 package com.ihjklj.pdc.util;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
+
 import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.model.ImoocJson;
@@ -42,7 +46,7 @@ public class UtilMethod {
         String data = new IkOkhttp().sget(url);
         if (data != null) {
             try {
-                LOG.d("data : " + data);
+                //LOG.d("data : " + data);
                 Gson jsonParse = new Gson();
                 ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
                 List<ImoocJson.ImoocCourse> coursesList = imoocJsonObj.getData();
@@ -53,5 +57,25 @@ public class UtilMethod {
             }
         }
         return null;
+    }
+
+    public static void newDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("普通的对话框的标题");
+        builder.setMessage("这是一个普通的对话框的内容");
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                LOG.d("cancel");
+            }
+        });
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                LOG.d("sure");
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

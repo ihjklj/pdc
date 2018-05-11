@@ -81,10 +81,14 @@ public class ImoocActivity extends AppCompatActivity {
     }
 
     private void runSpinner() {
-        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NET, "网站顺序"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NUM, "学习人数"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_UP, "上升最快"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_DOWN, "下降最快"));
+        //mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NET, "网站顺序"));
+        //mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NUM, "学习人数"));
+        //mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_UP, "上升最快"));
+        //mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_DOWN, "下降最快"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NET, "net order"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NUM, "student"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_UP, "rising"));
+        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_DOWN, "falling"));
         mSpinnerAdapter = new ImoocSpinnerAdapter(this, mSpinnerItemList);
         mSpinner.setAdapter(mSpinnerAdapter);
     }

@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorbblackwhite">
 
     <Spinner
         android:id="@+id/linechart_layout_spinner"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:spinnerMode="dropdown"
-        android:popupBackground="@color/colorwhiteblack"/>
+        android:popupBackground="@color/colorbblackwhite"/>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/linechart_layout_linechart"

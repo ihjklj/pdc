@@ -2,22 +2,28 @@ package com.ihjklj.pdc.chart;
 
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import java.util.List;
+import com.ihjklj.pdc.util.LOG;
 
 /**
- * Created by ihjklj on 2018/5/11.
+ * Created by Administrator on 2018/5/11.
  */
 
 public class ImoocXValueFormatter implements IAxisValueFormatter {
 
-    private List<String> mLabelList;
-
-    public ImoocXValueFormatter(List<String> list) {
-        this.mLabelList = list;
+    public ImoocXValueFormatter() {
+        //
     }
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        return mLabelList.get((int) value % mLabelList.size());
+        String showXData = null;
+        if ((int)value == 0) {
+            showXData = "";
+        }
+        else {
+            showXData = (int)value + "";
+        }
+        LOG.e("value:" + value + ",show x data:" + showXData);
+        return showXData;
     }
 }
