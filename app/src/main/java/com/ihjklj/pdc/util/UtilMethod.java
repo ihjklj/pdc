@@ -59,10 +59,10 @@ public class UtilMethod {
         return null;
     }
 
-    public static void newDialog(Context context) {
+    public static void newDialog(Context context, String data) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("普通的对话框的标题");
-        builder.setMessage("这是一个普通的对话框的内容");
+        builder.setTitle("坐标");
+        builder.setMessage(data);
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

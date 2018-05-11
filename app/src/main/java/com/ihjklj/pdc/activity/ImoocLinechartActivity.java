@@ -188,7 +188,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         mLineChart.setVisibleXRangeMaximum(20f);
 
         //
-        mLineChart.setOnChartValueSelectedListener(new IkChartDataSelected());
+        mLineChart.setOnChartValueSelectedListener(new IkChartDataSelected(this));
 
         //
         mLineChart.setOnChartGestureListener(new IkChartGesture());
