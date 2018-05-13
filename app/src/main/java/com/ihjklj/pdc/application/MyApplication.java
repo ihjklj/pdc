@@ -10,6 +10,7 @@ import com.ihjklj.pdc.util.LOG;
 public class MyApplication extends Application {
 
     public static final String TAG = "pdc";
+    public static boolean IS_USE_CN = true;
 
     @Override
     public void onCreate() {

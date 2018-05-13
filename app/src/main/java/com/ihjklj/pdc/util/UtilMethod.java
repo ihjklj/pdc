@@ -3,7 +3,6 @@ package com.ihjklj.pdc.util;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-
 import com.google.gson.Gson;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.model.ImoocJson;
@@ -42,14 +41,15 @@ public class UtilMethod {
     }
 
     public static List<ImoocJson.ImoocCourse> imoocGet(String url) {
-        LOG.d("rquest url : " + url);
+        LOG.e("rquest url : " + url);
         String data = new IkOkhttp().sget(url);
         if (data != null) {
             try {
-                //LOG.d("data : " + data);
+                LOG.e("data : " + data);
                 Gson jsonParse = new Gson();
                 ImoocJson imoocJsonObj = jsonParse.fromJson(data, ImoocJson.class);
                 List<ImoocJson.ImoocCourse> coursesList = imoocJsonObj.getData();
+                LOG.e("course size:" + coursesList.size());
                 return coursesList;
             }
             catch (Exception e) {
@@ -77,5 +77,9 @@ public class UtilMethod {
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public static interface imoocParse {
+        public List<ImoocJson.ImoocCourse> parse();
     }
 }

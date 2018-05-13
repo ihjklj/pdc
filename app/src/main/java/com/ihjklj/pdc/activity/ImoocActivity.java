@@ -11,9 +11,10 @@ import android.widget.Spinner;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.adapter.ImoocAdapter;
 import com.ihjklj.pdc.adapter.ImoocSpinnerAdapter;
+import com.ihjklj.pdc.application.MyApplication;
 import com.ihjklj.pdc.model.ImoocJson;
 import com.ihjklj.pdc.model.ImoocSpinnerItem;
-import com.ihjklj.pdc.set.DefineSet;
+import com.ihjklj.pdc.set.ImoocConstSet;
 import com.ihjklj.pdc.util.LOG;
 import com.ihjklj.pdc.util.UtilMethod;
 import java.util.ArrayList;
@@ -81,14 +82,18 @@ public class ImoocActivity extends AppCompatActivity {
     }
 
     private void runSpinner() {
-        //mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NET, "网站顺序"));
-        //mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NUM, "学习人数"));
-        //mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_UP, "上升最快"));
-        //mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_DOWN, "下降最快"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NET, "net order"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_NUM, "student"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_UP, "rising"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(DefineSet.IMOOC_COURSE_TYPE_DOWN, "falling"));
+        if (MyApplication.IS_USE_CN) {
+            mSpinnerItemList.add(new ImoocSpinnerItem(ImoocConstSet.IMOOC_COURSE_TYPE_NET, "网站顺序"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(ImoocConstSet.IMOOC_COURSE_TYPE_NUM, "学习人数"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(ImoocConstSet.IMOOC_COURSE_TYPE_UP, "上升最快"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(ImoocConstSet.IMOOC_COURSE_TYPE_DOWN, "下降最快"));
+        }
+        else {
+            mSpinnerItemList.add(new ImoocSpinnerItem(ImoocConstSet.IMOOC_COURSE_TYPE_NET, "net order"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(ImoocConstSet.IMOOC_COURSE_TYPE_NUM, "student"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(ImoocConstSet.IMOOC_COURSE_TYPE_UP, "rising"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(ImoocConstSet.IMOOC_COURSE_TYPE_DOWN, "falling"));
+        }
         mSpinnerAdapter = new ImoocSpinnerAdapter(this, mSpinnerItemList);
         mSpinner.setAdapter(mSpinnerAdapter);
     }
@@ -112,7 +117,7 @@ public class ImoocActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<ImoocJson.ImoocCourse> coursesList = UtilMethod.imoocGet(DefineSet.IMOOC_URL);
+                List<ImoocJson.ImoocCourse> coursesList = UtilMethod.imoocGet(ImoocConstSet.IMOOC_URL);
                 if (coursesList != null) {
                     for (ImoocJson.ImoocCourse course : coursesList) {
                         mCourseList.add(course);
@@ -134,16 +139,16 @@ public class ImoocActivity extends AppCompatActivity {
             public int compare(ImoocJson.ImoocCourse objs, ImoocJson.ImoocCourse objt) {
                 int ret = 0;
                 switch (flag) {
-                    case DefineSet.IMOOC_COURSE_TYPE_NET:
+                    case ImoocConstSet.IMOOC_COURSE_TYPE_NET:
                         ret = objs.getId() - objt.getId();
                         break;
-                    case DefineSet.IMOOC_COURSE_TYPE_NUM:
+                    case ImoocConstSet.IMOOC_COURSE_TYPE_NUM:
                         ret = objt.getStudent() - objs.getStudent();
                         break;
-                    case DefineSet.IMOOC_COURSE_TYPE_UP:
+                    case ImoocConstSet.IMOOC_COURSE_TYPE_UP:
                         ret = objt.getIndex_sign() - objs.getIndex_sign();
                         break;
-                    case DefineSet.IMOOC_COURSE_TYPE_DOWN:
+                    case ImoocConstSet.IMOOC_COURSE_TYPE_DOWN:
                         ret = objs.getIndex_sign() - objt.getIndex_sign();
                         break;
                     default:

@@ -42,16 +42,16 @@ public class IkChartGesture implements OnChartGestureListener {
 
     @Override
     public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {
-        LOG.e("onChartFling");
+        LOG.e("onChartFling x:" + velocityX + ",y:" + velocityY);
     }
 
     @Override
     public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
-        LOG.e("onChartScale");
+        LOG.e("onChartScale x:" + scaleX + ",y:" + scaleY);
     }
 
     @Override
     public void onChartTranslate(MotionEvent me, float dX, float dY) {
-        LOG.e("onChartTranslate");
+        LOG.e("onChartTranslate x:" + dX + ",y:" +dY);
     }
 }

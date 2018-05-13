@@ -15,17 +15,18 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.ihjklj.pdc.R;
 import com.ihjklj.pdc.adapter.ImoocSpinnerAdapter;
+import com.ihjklj.pdc.application.MyApplication;
 import com.ihjklj.pdc.chart.IkChartDataSelected;
 import com.ihjklj.pdc.chart.IkChartGesture;
 import com.ihjklj.pdc.chart.IkValueFormatter;
-import com.ihjklj.pdc.chart.ImoocXValueFormatter;
 import com.ihjklj.pdc.chart.ImoocXValueListFormatter;
 import com.ihjklj.pdc.model.ImoocJson;
 import com.ihjklj.pdc.model.ImoocSpinnerItem;
 import com.ihjklj.pdc.model.LinechartItem;
-import com.ihjklj.pdc.set.DefineSet;
+import com.ihjklj.pdc.set.ImoocConstSet;
 import com.ihjklj.pdc.util.LOG;
 import com.ihjklj.pdc.util.UtilMethod;
 import java.util.ArrayList;
@@ -45,6 +46,8 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     private ImoocSpinnerAdapter mSpinnerAdapter;
     private List<ImoocSpinnerItem> mSpinnerItemList;
     private ImoocJson.ImoocCourse mImoocCourse;
+    private boolean mIsChartExists;
+    private ImoocXValueListFormatter mListFormatter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +75,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
 
     private void init() {
         mSpinnerItemList = new ArrayList<ImoocSpinnerItem>();
+        mIsChartExists = false;
     }
 
     private void initView() {
@@ -83,7 +87,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
                 ImoocSpinnerItem spinnerItem = (ImoocSpinnerItem)mSpinner.getSelectedItem();
                 LOG.d("spinner selected " + spinnerItem.getStr());
                 //mSpinner.setEnabled(false);
-                getLineChartData("title_" + mImoocCourse.getTitle() + "_" + spinnerItem.getId());
+                getLineChartData("title_" + mImoocCourse.getTitle() + "_" + spinnerItem.getId(), mIsChartExists);
             }
 
             @Override
@@ -95,25 +99,29 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     }
 
     private void runSpinner() {
-        //mSpinnerItemList.add(new ImoocSpinnerItem(7, "近一个星期"));
-        //mSpinnerItemList.add(new ImoocSpinnerItem(30, "近一个月"));
-        //mSpinnerItemList.add(new ImoocSpinnerItem(90, "近一个季度"));
-        //mSpinnerItemList.add(new ImoocSpinnerItem(180, "近半年"));
-        //mSpinnerItemList.add(new ImoocSpinnerItem(360, "近一年"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(7, "week"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(30, "month"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(90, "quarter"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(180, "half a year"));
-        mSpinnerItemList.add(new ImoocSpinnerItem(360, "year"));
+        if (MyApplication.IS_USE_CN) {
+            mSpinnerItemList.add(new ImoocSpinnerItem(7, "近一个星期"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(30, "近一个月"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(90, "近一个季度"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(180, "近半年"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(360, "近一年"));
+        }
+        else {
+            mSpinnerItemList.add(new ImoocSpinnerItem(7, "week"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(30, "month"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(90, "quarter"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(180, "half a year"));
+            mSpinnerItemList.add(new ImoocSpinnerItem(360, "year"));
+        }
         mSpinnerAdapter = new ImoocSpinnerAdapter(this, mSpinnerItemList);
         mSpinner.setAdapter(mSpinnerAdapter);
     }
 
-    private void getLineChartData(final String keyname) {
+    private void getLineChartData(final String keyname, final boolean isChartExists) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<ImoocJson.ImoocCourse> coursesList = UtilMethod.imoocGet(DefineSet.IMOOC_KEY + keyname);
+                List<ImoocJson.ImoocCourse> coursesList = UtilMethod.imoocGet(ImoocConstSet.IMOOC_KEY + keyname);
                 if (coursesList != null) {
                     final List<LinechartItem> linchartitemList = new ArrayList<LinechartItem>();
                     for (ImoocJson.ImoocCourse course : coursesList) {
@@ -124,7 +132,13 @@ public class ImoocLinechartActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            runLineChart(linchartitemList);
+                            sort(linchartitemList);
+                            if (isChartExists) {
+                                refreshChartData(linchartitemList);
+                            }
+                            else {
+                                runLineChart(linchartitemList);
+                            }
                             //mSpinner.setEnabled(true);
                         }
                     });
@@ -133,13 +147,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         }).start();
     }
 
-    private LineData getData(List<LinechartItem> items) {
-        Collections.sort(items, new Comparator<LinechartItem>() {
-            @Override
-            public int compare(LinechartItem objs, LinechartItem objt) {
-                return objs.getTime() - objt.getTime();
-            }
-        });
+    private List<Entry> getEntry(List<LinechartItem> items) {
         List<Entry> entries = new ArrayList<Entry>();
         int i = 0;
         for (LinechartItem item : items) {
@@ -147,7 +155,11 @@ public class ImoocLinechartActivity extends AppCompatActivity {
             LOG.d("time:" + item.getTime() + ",num:" + item.getNum());
             entries.add(new Entry(i++, item.getNum()));
         }
-        LineDataSet dataset = new LineDataSet(entries, "慕课网数据");
+        return entries;
+    }
+
+    private LineData getData(List<LinechartItem> items) {
+        LineDataSet dataset = new LineDataSet(getEntry(items), ImoocConstSet.IMOOC_LABEL_CN);
         dataset.setColor(Color.BLACK);
         dataset.setValueTextColor(Color.RED);
         dataset.setValueFormatter(new IkValueFormatter());
@@ -157,12 +169,41 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         return linedata;
     }
 
+    private void refreshChartData(List<LinechartItem> list) {
+        LOG.d("refresh linechar.");
+        ILineDataSet dataset = mLineChart.getLineData().getDataSetByLabel(ImoocConstSet.IMOOC_LABEL_CN, true);
+        //dataset.addEntry(getEntry(list));
+        LineData linedata = mLineChart.getLineData();
+        //LineData linedataTest = mLineChart.getData();
+        linedata.removeDataSet(dataset);
+        linedata.addDataSet(new LineDataSet(getEntry(list), ImoocConstSet.IMOOC_LABEL_CN));
+        //记得要更新一下X轴要替换的字符串，不然数据更新以后会出现奇怪情况
+        List<String> strList = new ArrayList<String>();
+        for (LinechartItem item : list) {
+            strList.add(item.getTime() + "");
+        }
+        mListFormatter.setList(strList);
+        mLineChart.notifyDataSetChanged();
+        mLineChart.invalidate();
+    }
+
+    private void sort(List<LinechartItem> items) {
+        Collections.sort(items, new Comparator<LinechartItem>() {
+            @Override
+            public int compare(LinechartItem objs, LinechartItem objt) {
+                return objs.getTime() - objt.getTime();
+            }
+        });
+    }
+
     private void runLineChart(List<LinechartItem> items) {
 
         mLineChart.setData(getData(items));
 
+        //设置X轴参数
         setChartXAxis(items);
 
+        //设置Y轴参数
         setChartYAxis();
 
         //设置描述文本显示
@@ -179,7 +220,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         //设置是否可以缩放
         mLineChart.setScaleEnabled(true);
 
-        //
+        //设置是否可以触摸
         mLineChart.setTouchEnabled(true);
 
         //那么，我们该如何设置当前窗口只展示固定的坐标点个数，剩余的通过滑动展现出来？
@@ -187,14 +228,24 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         // 该方法表示最大的展示区域,即显示不超过该值的点。需要注意的是必须在setData(data)后才生效
         mLineChart.setVisibleXRangeMaximum(20f);
 
-        //
-        mLineChart.setOnChartValueSelectedListener(new IkChartDataSelected(this));
+        //设置Y轴不可缩放
+        mLineChart.setScaleYEnabled(false);
 
-        //
+        //设置X轴不可缩放
+        mLineChart.setScaleXEnabled(false);
+
+        //设置chart选择项接口
+        IkChartDataSelected dataselect = new IkChartDataSelected(this, items);
+        //dataselect.setDataSetList(items);
+        mLineChart.setOnChartValueSelectedListener(dataselect);
+
+        //设置触摸效果接口
         mLineChart.setOnChartGestureListener(new IkChartGesture());
 
-        //
+        //刷新数据
         mLineChart.invalidate();
+
+        mIsChartExists = true;
     }
 
     private void setChartXAxis(List<LinechartItem> list) {
@@ -209,7 +260,8 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         for (LinechartItem item : list) {
             datalist.add(item.getTime() + "");
         }
-        xAxis.setValueFormatter(new ImoocXValueListFormatter(datalist));
+        mListFormatter = new ImoocXValueListFormatter(datalist);
+        xAxis.setValueFormatter(mListFormatter);
 
         //一个界面显示6个Lable，那么这里要设置11个
         xAxis.setLabelCount(6);
@@ -218,7 +270,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         xAxis.setAxisLineWidth(1f);
 
         //设置字体大小10sp
-        xAxis.setTextSize(15f);
+        xAxis.setTextSize(5f);
 
         //绘制网格线，默认为true
         xAxis.setDrawGridLines(true);
@@ -241,11 +293,11 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         //
         //xAxis.setAxisMinimum(1f);
 
+        //
+        xAxis.setLabelRotationAngle(90);
+
         // 设置x轴的LimitLine
-        //LimitLine xLimitLine = new LimitLine(5f,"XLimit 测试");
-        //xLimitLine.setLineColor(Color.RED);
-        //xLimitLine.setTextColor(Color.GREEN);
-        //xAxis.addLimitLine(xLimitLine);
+        //xAxis.addLimitLine(getLimitline(50f,"Xlimit 测试"));
     }
 
     private void setChartYAxis() {
@@ -256,17 +308,21 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         mLineChart.getAxisRight().setEnabled(false);
 
         //设置Y轴最大最小值，不设置chart会自己计算
-        leftAxis.setAxisMinimum(0f);
-        leftAxis.setAxisMaximum(100f);
+        //leftAxis.setAxisMinimum(0f);
+        //leftAxis.setAxisMaximum(100f);
 
         //绘制网格线 默认为true
         leftAxis.setDrawGridLines(true);
 
         // 设置x轴的LimitLine，index是从0开始的
-        LimitLine yLimitLine = new LimitLine(50f,"Ylimit 测试");
-        yLimitLine.setLineColor(Color.RED);
-        yLimitLine.setTextColor(Color.GREEN);
-        leftAxis.addLimitLine(yLimitLine);
+        //leftAxis.addLimitLine(getLimitline(50f,"Ylimit 测试"));
+    }
+
+    private LimitLine getLimitline(float limitValue, String label) {
+        LimitLine limitLine = new LimitLine(limitValue, label);
+        limitLine.setLineColor(Color.RED);
+        limitLine.setTextColor(Color.GREEN);
+        return limitLine;
     }
 
     private List<LinechartItem> getItem() {

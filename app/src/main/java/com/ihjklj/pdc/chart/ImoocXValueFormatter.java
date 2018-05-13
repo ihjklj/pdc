@@ -23,7 +23,7 @@ public class ImoocXValueFormatter implements IAxisValueFormatter {
         else {
             showXData = (int)value + "";
         }
-        LOG.e("value:" + value + ",show x data:" + showXData);
+        LOG.d("value:" + value + ",show x data:" + showXData);
         return showXData;
     }
 }

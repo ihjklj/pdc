@@ -17,17 +17,25 @@ public class ImoocXValueListFormatter implements IAxisValueFormatter {
         this.mLabelList = list;
     }
 
+    public void setList(List<String> list) {
+        this.mLabelList = list;
+    }
+
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-//        String showData = null;
-//        if ((int)value == 0) {
-//            showData = "";
-//        }
-//        else {
-//            showData = mLabelList.get((int)value % mLabelList.size());
-//        }
-        String showData = "";
-        LOG.e("value:" + value + ",show x data:" + showData);
+        String showData = null;
+        if (mLabelList != null) {
+            if ((int)value == 0) {
+                showData = "";
+            }
+            else {
+                showData = mLabelList.get((int)value % mLabelList.size());
+            }
+        }
+        else {
+            showData = "" + value;
+        }
+        LOG.d("value:" + value + ",show x data:" + showData);
         return showData;
     }
 }
