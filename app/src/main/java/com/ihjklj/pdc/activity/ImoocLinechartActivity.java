@@ -17,14 +17,14 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.ihjklj.pdc.R;
-import com.ihjklj.pdc.adapter.ImoocSpinnerAdapter;
+import com.ihjklj.pdc.adapter.IkSpinnerAdapter;
 import com.ihjklj.pdc.application.MyApplication;
 import com.ihjklj.pdc.chart.IkChartDataSelected;
 import com.ihjklj.pdc.chart.IkChartGesture;
 import com.ihjklj.pdc.chart.IkValueFormatter;
 import com.ihjklj.pdc.chart.IkXValueListFormatter;
 import com.ihjklj.pdc.model.ImoocJson;
-import com.ihjklj.pdc.model.ImoocSpinnerItem;
+import com.ihjklj.pdc.model.IkSpinnerItem;
 import com.ihjklj.pdc.model.LinechartItem;
 import com.ihjklj.pdc.set.ImoocConstSet;
 import com.ihjklj.pdc.util.LOG;
@@ -43,8 +43,8 @@ public class ImoocLinechartActivity extends AppCompatActivity {
 
     private LineChart mLineChart;
     private Spinner mSpinner;
-    private ImoocSpinnerAdapter mSpinnerAdapter;
-    private List<ImoocSpinnerItem> mSpinnerItemList;
+    private IkSpinnerAdapter mSpinnerAdapter;
+    private List<IkSpinnerItem> mSpinnerItemList;
     private ImoocJson.ImoocCourse mImoocCourse;
     private boolean mIsChartExists;
     private IkXValueListFormatter mListFormatter;
@@ -74,7 +74,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     }
 
     private void init() {
-        mSpinnerItemList = new ArrayList<ImoocSpinnerItem>();
+        mSpinnerItemList = new ArrayList<IkSpinnerItem>();
         mIsChartExists = false;
     }
 
@@ -84,7 +84,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ImoocSpinnerItem spinnerItem = (ImoocSpinnerItem)mSpinner.getSelectedItem();
+                IkSpinnerItem spinnerItem = (IkSpinnerItem)mSpinner.getSelectedItem();
                 LOG.d("spinner selected " + spinnerItem.getStr());
                 //mSpinner.setEnabled(false);
                 getLineChartData("title_" + mImoocCourse.getTitle() + "_" + spinnerItem.getId(), mIsChartExists);
@@ -100,20 +100,20 @@ public class ImoocLinechartActivity extends AppCompatActivity {
 
     private void runSpinner() {
         if (MyApplication.IS_USE_CN) {
-            mSpinnerItemList.add(new ImoocSpinnerItem(7, "近一个星期"));
-            mSpinnerItemList.add(new ImoocSpinnerItem(30, "近一个月"));
-            mSpinnerItemList.add(new ImoocSpinnerItem(90, "近一个季度"));
-            mSpinnerItemList.add(new ImoocSpinnerItem(180, "近半年"));
-            mSpinnerItemList.add(new ImoocSpinnerItem(360, "近一年"));
+            mSpinnerItemList.add(new IkSpinnerItem(7, "近一个星期"));
+            mSpinnerItemList.add(new IkSpinnerItem(30, "近一个月"));
+            mSpinnerItemList.add(new IkSpinnerItem(90, "近一个季度"));
+            mSpinnerItemList.add(new IkSpinnerItem(180, "近半年"));
+            mSpinnerItemList.add(new IkSpinnerItem(360, "近一年"));
         }
         else {
-            mSpinnerItemList.add(new ImoocSpinnerItem(7, "week"));
-            mSpinnerItemList.add(new ImoocSpinnerItem(30, "month"));
-            mSpinnerItemList.add(new ImoocSpinnerItem(90, "quarter"));
-            mSpinnerItemList.add(new ImoocSpinnerItem(180, "half a year"));
-            mSpinnerItemList.add(new ImoocSpinnerItem(360, "year"));
+            mSpinnerItemList.add(new IkSpinnerItem(7, "week"));
+            mSpinnerItemList.add(new IkSpinnerItem(30, "month"));
+            mSpinnerItemList.add(new IkSpinnerItem(90, "quarter"));
+            mSpinnerItemList.add(new IkSpinnerItem(180, "half a year"));
+            mSpinnerItemList.add(new IkSpinnerItem(360, "year"));
         }
-        mSpinnerAdapter = new ImoocSpinnerAdapter(this, mSpinnerItemList);
+        mSpinnerAdapter = new IkSpinnerAdapter(this, mSpinnerItemList);
         mSpinner.setAdapter(mSpinnerAdapter);
     }
 
@@ -172,9 +172,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     private void refreshChartData(List<LinechartItem> list) {
         LOG.d("refresh linechar.");
         ILineDataSet dataset = mLineChart.getLineData().getDataSetByLabel(ImoocConstSet.IMOOC_LABEL_CN, true);
-        //dataset.addEntry(getEntry(list));
         LineData linedata = mLineChart.getLineData();
-        //LineData linedataTest = mLineChart.getData();
         linedata.removeDataSet(dataset);
         linedata.addDataSet(new LineDataSet(getEntry(list), ImoocConstSet.IMOOC_LABEL_CN));
         //记得要更新一下X轴要替换的字符串，不然数据更新以后会出现奇怪情况
@@ -235,7 +233,11 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         mLineChart.setScaleXEnabled(false);
 
         //设置chart选择项接口
-        IkChartDataSelected dataselect = new IkChartDataSelected(this, items);
+        List<String> strList = new ArrayList<String>();
+        for (LinechartItem item : items) {
+            strList.add(item.getTime() + "");
+        }
+        IkChartDataSelected dataselect = new IkChartDataSelected(this, strList);
         //dataselect.setDataSetList(items);
         mLineChart.setOnChartValueSelectedListener(dataselect);
 

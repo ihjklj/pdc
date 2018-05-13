@@ -6,8 +6,6 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.ihjklj.pdc.model.LinechartItem;
 import com.ihjklj.pdc.util.LOG;
-import com.ihjklj.pdc.util.UtilMethod;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,26 +15,26 @@ import java.util.List;
 public class IkChartDataSelected implements OnChartValueSelectedListener {
 
     private Context mContext;
-    private List<LinechartItem> mList;
+    private List<String> mList;
 
-    public IkChartDataSelected(Context context, List<LinechartItem> list) {
+    public IkChartDataSelected(Context context, List<String> list) {
         this.mContext = context;
         this.mList = list;
     }
 
-    public void setDataSetList(List<LinechartItem> list) {
+    public void setDataSetList(List<String> list) {
         this.mList = list;
     }
 
     @Override
     public void onValueSelected(Entry e, Highlight h) {
         LOG.d("selected data(" + e.getX() + ", " + e.getY() + "\n");
-        int datatime = 0;
+        String datatime = null;
         if (mList != null && mList.size() > 0) {
-            datatime = mList.get((int)e.getX() % mList.size()).getTime();
+            datatime = mList.get((int)e.getX() % mList.size());
         }
         else {
-            datatime = (int)e.getX();
+            datatime = (int)e.getX() + "";
         }
         LOG.d(datatime + ", " + e.getY());
         //UtilMethod.newDialog(mContext, datatime + ", " + e.getY());
