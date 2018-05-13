@@ -22,7 +22,7 @@ import com.ihjklj.pdc.application.MyApplication;
 import com.ihjklj.pdc.chart.IkChartDataSelected;
 import com.ihjklj.pdc.chart.IkChartGesture;
 import com.ihjklj.pdc.chart.IkValueFormatter;
-import com.ihjklj.pdc.chart.ImoocXValueListFormatter;
+import com.ihjklj.pdc.chart.IkXValueListFormatter;
 import com.ihjklj.pdc.model.ImoocJson;
 import com.ihjklj.pdc.model.ImoocSpinnerItem;
 import com.ihjklj.pdc.model.LinechartItem;
@@ -47,7 +47,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
     private List<ImoocSpinnerItem> mSpinnerItemList;
     private ImoocJson.ImoocCourse mImoocCourse;
     private boolean mIsChartExists;
-    private ImoocXValueListFormatter mListFormatter;
+    private IkXValueListFormatter mListFormatter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -260,7 +260,7 @@ public class ImoocLinechartActivity extends AppCompatActivity {
         for (LinechartItem item : list) {
             datalist.add(item.getTime() + "");
         }
-        mListFormatter = new ImoocXValueListFormatter(datalist);
+        mListFormatter = new IkXValueListFormatter(datalist);
         xAxis.setValueFormatter(mListFormatter);
 
         //一个界面显示6个Lable，那么这里要设置11个

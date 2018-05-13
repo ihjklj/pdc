@@ -9,11 +9,11 @@ import java.util.List;
  * Created by ihjklj on 2018/5/11.
  */
 
-public class ImoocXValueListFormatter implements IAxisValueFormatter {
+public class IkXValueListFormatter implements IAxisValueFormatter {
 
     private List<String> mLabelList;
 
-    public ImoocXValueListFormatter(List<String> list) {
+    public IkXValueListFormatter(List<String> list) {
         this.mLabelList = list;
     }
 
