@@ -9,7 +9,10 @@ import com.ihjklj.pdc.util.LOG;
 
 public class MyApplication extends Application {
 
+    //本项目打印的log的TAG
     public static final String TAG = "pdc";
+
+    //是否使用中文字符
     public static boolean IS_USE_CN = true;
 
     @Override
