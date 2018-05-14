@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
-
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.ihjklj.pdc.R;
@@ -15,11 +14,9 @@ import com.ihjklj.pdc.application.MyApplication;
 import com.ihjklj.pdc.chart.IkLineChart;
 import com.ihjklj.pdc.model.IkSpinnerItem;
 import com.ihjklj.pdc.model.ImoocJson;
-import com.ihjklj.pdc.model.LinechartItem;
 import com.ihjklj.pdc.set.ImoocConstSet;
 import com.ihjklj.pdc.util.LOG;
 import com.ihjklj.pdc.util.UtilMethod;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,6 +39,8 @@ public class IkChartTestActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ik_chart_layout);
+
+        getIntentData();
 
         init();
 
@@ -106,12 +105,17 @@ public class IkChartTestActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<ImoocJson.ImoocCourse> coursesList = UtilMethod.imoocGet(ImoocConstSet.IMOOC_KEY + keyname);
+                final List<ImoocJson.ImoocCourse> coursesList = UtilMethod.imoocGet(ImoocConstSet.IMOOC_KEY + keyname);
                 if (coursesList != null) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            //sort(linchartitemList);
+                            sort(coursesList);
+                            List<String> strList = new ArrayList<String>();
+                            for (ImoocJson.ImoocCourse course : coursesList) {
+                                strList.add(course.getAtime());
+                            }
+                            mIkLineChart.run(getEntry(coursesList), strList);
                         }
                     });
                 }
@@ -119,22 +123,22 @@ public class IkChartTestActivity extends AppCompatActivity {
         }).start();
     }
 
-    private List<Entry> getEntry(List<LinechartItem> items) {
+    private List<Entry> getEntry(List<ImoocJson.ImoocCourse> items) {
         List<Entry> entries = new ArrayList<Entry>();
-        int i = 0;
-        for (LinechartItem item : items) {
-            //entries.add(new Entry(item.getTime(), item.getNum()));
-            LOG.d("time:" + item.getTime() + ",num:" + item.getNum());
-            entries.add(new Entry(i++, item.getNum()));
+        for (int i=0; i<items.size(); i++) {
+            LOG.d("time:" + items.get(i).getAtime() + ",num:" + items.get(i).getStudent());
+            entries.add(new Entry(i, items.get(i).getStudent()));
         }
         return entries;
     }
 
-    private void sort(List<LinechartItem> items) {
-        Collections.sort(items, new Comparator<LinechartItem>() {
+    private void sort(List<ImoocJson.ImoocCourse> items) {
+        Collections.sort(items, new Comparator<ImoocJson.ImoocCourse>() {
             @Override
-            public int compare(LinechartItem objs, LinechartItem objt) {
-                return objs.getTime() - objt.getTime();
+            public int compare(ImoocJson.ImoocCourse objs, ImoocJson.ImoocCourse objt) {
+                int objsTime = Integer.parseInt(objs.getAtime().replace("-", ""));
+                int objtTime = Integer.parseInt(objt.getAtime().replace("-", ""));
+                return objsTime - objtTime;
             }
         });
     }

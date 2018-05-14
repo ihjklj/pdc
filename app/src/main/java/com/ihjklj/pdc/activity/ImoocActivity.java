@@ -105,7 +105,8 @@ public class ImoocActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ImoocJson.ImoocCourse imooccourse = mCourseList.get(position);
-                Intent intent = new Intent(ImoocActivity.this, ImoocLinechartActivity.class);
+                Intent intent = new Intent(ImoocActivity.this, IkChartTestActivity.class);
+                //Intent intent = new Intent(ImoocActivity.this, ImoocLinechartActivity.class);
                 intent.putExtra("imoocCourse", imooccourse);
                 startActivity(intent);
             }
