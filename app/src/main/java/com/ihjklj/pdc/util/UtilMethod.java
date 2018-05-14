@@ -79,6 +79,14 @@ public class UtilMethod {
         dialog.show();
     }
 
+    public static int dateToInt(String time) {
+        time = time.replace("-", "")
+                .replace("_", "")
+                .replace(":", "")
+                .replace(" ", "");
+       return Integer.parseInt(time);
+    }
+
     public static interface imoocParse {
         public List<ImoocJson.ImoocCourse> parse();
     }

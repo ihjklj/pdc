@@ -136,8 +136,8 @@ public class IkChartTestActivity extends AppCompatActivity {
         Collections.sort(items, new Comparator<ImoocJson.ImoocCourse>() {
             @Override
             public int compare(ImoocJson.ImoocCourse objs, ImoocJson.ImoocCourse objt) {
-                int objsTime = Integer.parseInt(objs.getAtime().replace("-", ""));
-                int objtTime = Integer.parseInt(objt.getAtime().replace("-", ""));
+                int objsTime = UtilMethod.dateToInt(objs.getAtime());
+                int objtTime = UtilMethod.dateToInt(objt.getAtime());
                 return objsTime - objtTime;
             }
         });
